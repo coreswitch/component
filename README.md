@@ -1,4 +1,4 @@
 component
 =========
 
-Component dependecies library inspired by Situart Sierra's Clojure component.
+Component dependencies library inspired by Stuart Sierra's Clojure component.
