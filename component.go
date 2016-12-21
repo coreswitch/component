@@ -14,6 +14,10 @@
 
 package component
 
+import (
+	"github.com/coreswitch/dependency"
+)
+
 type Component interface {
 	Start() Component
 	Stop() Component
@@ -38,8 +42,33 @@ func ComponentWith(c Component, deps ...string) Component {
 	return &ComponentItem{Component: c, depends: deps}
 }
 
+func (this *SystemMap) Graph() *dependency.MapDependencyGraph {
+	graph := dependency.NewGraph()
+	for key, value := range *this {
+		if item, ok := value.(*ComponentItem); ok {
+			for _, dep := range item.depends {
+				graph.Depend(key, dep)
+			}
+		}
+	}
+	return graph
+}
+
 func (this *SystemMap) Start() {
+	graph := this.Graph()
+	for _, key := range graph.TopoSort() {
+		if component, ok := (*this)[key]; ok {
+			component.Start()
+		}
+	}
 }
 
 func (this *SystemMap) Stop() {
+	graph := this.Graph()
+	topo := graph.TopoSort()
+	for i := len(topo) - 1; i > 0; i-- {
+		if component, ok := (*this)[topo[i]]; ok {
+			component.Stop()
+		}
+	}
 }
