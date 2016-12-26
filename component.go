@@ -66,7 +66,7 @@ func (this *SystemMap) Start() {
 func (this *SystemMap) Stop() {
 	graph := this.Graph()
 	topo := graph.TopoSort()
-	for i := len(topo) - 1; i > 0; i-- {
+	for i := len(topo) - 1; i >= 0; i-- {
 		if component, ok := (*this)[topo[i]]; ok {
 			component.Stop()
 		}
